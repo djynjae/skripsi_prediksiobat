@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apotek MEDILIFE - Prediksi Stok Batuk</title>
+    <link href="[https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap](https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap)" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    {% block additional_styles %}{% endblock %}
+</head>
+<body>
+    <div class="wrapper">
+        <nav class="sidebar">
+            <div class="sidebar-logo">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Medilife Logo" width="30">
+                Apotek MEDILIFE
+            </div>
+
+            <ul class="sidebar-menu">
+                <li class="sidebar-menu-item">
+                    <a href="{{ url_for('views.index') }}" class="sidebar-link {% if active_page == 'dashboard' %}active{% endif %}">
+                        <i class="fas fa-th-large"></i> Dashboard
+                    </a>
+                </li>
+                <li class="sidebar-menu-item">
+                    <a href="{{ url_for('views.data_obat') }}" class="sidebar-link {% if active_page == 'data_obat' %}active{% endif %}">
+                        <i class="fas fa-pills"></i> Data Obat
+                    </a>
+                </li>
+                <li class="sidebar-menu-item">
+                    <a href="{{ url_for('views.prediksi') }}" class="sidebar-link {% if active_page == 'prediksi' %}active{% endif %}">
+                        <i class="fas fa-chart-line"></i> Prediksi Least Square
+                    </a>
+                </li>
+                <li class="sidebar-menu-item">
+                    <a href="{{ url_for('views.tentang') }}" class="sidebar-link {% if active_page == 'tentang' %}active{% endif %}">
+                        <i class="fas fa-info-circle"></i> Tentang Kami
+                    </a>
+                </li>
+                <li class="sidebar-menu-item" style="margin-top: 40px;">
+                    <a href="{{ url_for('views.logout') }}" class="sidebar-link" style="color: #ffb3b3;">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <header class="header">
+                <div class="header-greeting">
+                    <span class="header-greeting-text"></span>
+                    <div style="font-size:0.9rem; color:#666;">Sistem Prediksi Stok Obat - Metode Least Square</div>
+                </div>
+                <div class="header-meta">
+                    <i class="far fa-calendar-alt"></i>
+                    Kamis, 15 Mei 2025
+                </div>
+            </header>
+
+            {% block content %}{% endblock %}
+
+            <footer class="footer">
+                © 2026 Apotek Medilife. All rights reserved.
+            </footer>
+        </main>
+    </div>
+    {% block additional_scripts %}{% endblock %}
+</body>
+</html>

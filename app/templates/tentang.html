@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="padding: 20px 40px;">
+    <div style="background-color: white; padding: 40px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #eee; max-width: 800px; margin: 0 auto; text-align: center;">
+        
+        <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo Medilife" style="width: 100px; margin-bottom: 20px;">
+        <h2 style="color: var(--primary-blue); margin-bottom: 10px;">Apotek Medilife</h2>
+        <p style="color: #666; font-size: 1.1rem; line-height: 1.6; margin-bottom: 30px;">
+            Sistem Prediksi Stok Obat Batuk ini dibangun untuk membantu manajemen Apotek Medilife dalam mengambil keputusan pengadaan barang. 
+            Dengan memanfaatkan data historis penjualan, sistem ini menerapkan algoritma <strong>Least Square</strong> untuk memproyeksikan kebutuhan stok obat di masa mendatang secara akurat.
+        </p>
+
+        <div style="display: flex; justify-content: center; gap: 30px; text-align: left; border-top: 1px solid #eee; padding-top: 30px;">
+            <div>
+                <h4 style="margin-bottom: 10px;"><i class="fas fa-database"></i> Modul Sistem</h4>
+                <ul style="color: #555; padding-left: 20px; font-size: 0.95rem;">
+                    <li>Python & Flask Web Framework</li>
+                    <li>Pandas Data Processor</li>
+                    <li>SQLite Database</li>
+                </ul>
+            </div>
+            <div>
+                <h4 style="margin-bottom: 10px;"><i class="fas fa-tablets"></i> Fokus Prediksi</h4>
+                <ul style="color: #555; padding-left: 20px; font-size: 0.95rem;">
+                    <li>OBH Combi</li>
+                    <li>Paratusin</li>
+                    <li>Pimtrakol</li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

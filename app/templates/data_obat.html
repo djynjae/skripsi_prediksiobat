@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div style="padding: 20px 40px;">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div style="padding: 15px; margin-bottom: 20px; border-radius: 8px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb;">
+                    <i class="fas fa-check-circle"></i> {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div style="background-color: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #eee;">
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+            <h2><i class="fas fa-history" style="color: var(--primary-blue);"></i> Data Historis Obat</h2>
+            <button onclick="bukaModal('modalTambah')" style="padding: 10px 20px; background-color: #27AE60; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-plus"></i> Tambah Data
+            </button>
+        </div>
+
+        <div style="overflow-x: auto; max-height: 600px; border-bottom: 1px solid #eee;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead style="position: sticky; top: 0; z-index: 1;">
+                    <tr style="background-color: var(--light-blue); border-bottom: 2px solid var(--primary-blue);">
+                        <th style="padding: 12px 15px; width: 50px;">No.</th>
+                        <th style="padding: 12px 15px;">Bulan</th>
+                        <th style="padding: 12px 15px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                Tahun
+                                <select id="filterTahun" onchange="jalankanFilter()" style="padding: 4px; border-radius: 4px; border: 1px solid #b0c4de; outline: none; cursor: pointer; font-weight: bold; color: var(--primary-blue);">
+                                    <option value="semua">Semua</option>
+                                    <option value="2022">2022</option>
+                                    <option value="2023">2023</option>
+                                    <option value="2024">2024</option>
+                                    <option value="2025">2025</option>
+                                </select>
+                            </div>
+                        </th>
+                        <th style="padding: 12px 15px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                Nama Obat
+                                <select id="filterObat" onchange="jalankanFilter()" style="padding: 4px; border-radius: 4px; border: 1px solid #b0c4de; outline: none; cursor: pointer; font-weight: bold; color: var(--primary-blue);">
+                                    <option value="semua">Semua</option>
+                                    <option value="obh combi">OBH Combi</option>
+                                    <option value="paratusin">Paratusin</option>
+                                    <option value="pimtrakol">Pimtrakol</option>
+                                </select>
+                            </div>
+                        </th>
+                        <th style="padding: 12px 15px;">Jumlah Stok</th>
+                        <th style="padding: 12px 15px; text-align: center; width: 160px;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="badanTabel">
+                    {% for baris in data_stok %}
+                    <tr style="border-bottom: 1px solid #eee;">
+                        <td class="kolom-nomor" style="padding: 12px 15px;">{{ loop.index }}</td>
+                        <td style="padding: 12px 15px;">{{ baris['bulan']|capitalize }}</td>
+                        <td class="kolom-tahun" style="padding: 12px 15px;">{{ baris['tahun'] }}</td>
+                        <td class="kolom-nama-obat" style="padding: 12px 15px;">
+                            {% if baris['nama_obat'] == 'obh_combi' %}
+                                <span style="font-weight: 600; color: #34495E;">OBH Combi</span>
+                            {% elif baris['nama_obat'] == 'paratusin' %}
+                                <span style="font-weight: 600; color: #16A085;">Paratusin</span>
+                            {% elif baris['nama_obat'] == 'pimtrakol' %}
+                                <span style="font-weight: 600; color: #8E44AD;">Pimtrakol</span>
+                            {% else %}
+                                {{ baris['nama_obat'] }}
+                            {% endif %}
+                        </td>
+                        <td style="padding: 12px 15px; font-weight: bold;">{{ baris['jumlah_stok'] }}</td>
+                        <td style="padding: 12px 15px; text-align: center; display: flex; justify-content: center; gap: 5px;">
+                            <button onclick="bukaModalEdit({{ baris['id'] }}, '{{ baris['nama_obat'] }}', '{{ baris['bulan'] }}', '{{ baris['tahun'] }}', '{{ baris['jumlah_stok'] }}')" style="padding: 6px 12px; background-color: #F39C12; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.85rem;" title="Edit Data">
+                                Edit
+                            </button>
+                            <button onclick="konfirmasiHapus({{ baris['id'] }})" style="padding: 6px 12px; background-color: #E74C3C; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.85rem;" title="Hapus Data">
+                                Hapus
+                            </button>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="6" style="text-align: center; padding: 30px; color: #888;">Belum ada data.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="modalTambah" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+    <div style="background: white; padding: 30px; border-radius: 12px; width: 400px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
+        <h3 style="margin-top: 0; color: var(--primary-blue);">Tambah Stok Historis</h3>
+        <form action="{{ url_for('views.tambah_obat') }}" method="POST">
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;">Nama Obat</label>
+                <select name="nama_obat" required style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc;">
+                    <option value="obh_combi">OBH Combi</option>
+                    <option value="paratusin">Paratusin</option>
+                    <option value="pimtrakol">Pimtrakol</option>
+                </select>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;">Bulan</label>
+                <input type="text" name="bulan" placeholder="Contoh: Januari" required style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;">Tahun</label>
+                <input type="number" name="tahun" placeholder="Contoh: 2024" required style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box;">
+            </div>
+            <div style="margin-bottom: 25px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;">Jumlah Stok (Botol)</label>
+                <input type="number" name="jumlah_stok" min="0" required style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box;">
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="button" onclick="tutupModal('modalTambah')" style="padding: 10px 15px; background: #95a5a6; color: white; border: none; border-radius: 6px; cursor: pointer;">Batal</button>
+                <button type="submit" style="padding: 10px 15px; background: #27AE60; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">Simpan Data</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="modalEdit" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+    <div style="background: white; padding: 30px; border-radius: 12px; width: 400px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
+        <h3 style="margin-top: 0; color: #F39C12;">Edit Stok Historis</h3>
+        <form id="formEdit" method="POST">
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;">Nama Obat</label>
+                <select name="nama_obat" id="edit_nama_obat" required style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc;">
+                    <option value="obh_combi">OBH Combi</option>
+                    <option value="paratusin">Paratusin</option>
+                    <option value="pimtrakol">Pimtrakol</option>
+                </select>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;">Bulan</label>
+                <input type="text" name="bulan" id="edit_bulan" required style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box;">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;">Tahun</label>
+                <input type="number" name="tahun" id="edit_tahun" required style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box;">
+            </div>
+            <div style="margin-bottom: 25px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;">Jumlah Stok (Botol)</label>
+                <input type="number" name="jumlah_stok" id="edit_jumlah_stok" min="0" required style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box;">
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="button" onclick="tutupModal('modalEdit')" style="padding: 10px 15px; background: #95a5a6; color: white; border: none; border-radius: 6px; cursor: pointer;">Batal</button>
+                <button type="submit" style="padding: 10px 15px; background: #F39C12; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">Update Data</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<form id="formHapus" method="POST" style="display: none;"></form>
+
+<script>
+    // Fitur Live Multi-Filter
+    function jalankanFilter() {
+        let nilaiFilterObat = document.getElementById("filterObat").value.toLowerCase();
+        let nilaiFilterTahun = document.getElementById("filterTahun").value;
+        let barisTabel = document.querySelectorAll("#badanTabel tr");
+        let nomorUrutBaru = 1;
+
+        barisTabel.forEach(baris => {
+            if (baris.cells.length > 1) {
+                let teksNamaObat = baris.querySelector(".kolom-nama-obat").textContent.toLowerCase();
+                let teksTahun = baris.querySelector(".kolom-tahun").textContent.trim();
+                
+                let cocokObat = (nilaiFilterObat === "semua" || teksNamaObat.includes(nilaiFilterObat));
+                let cocokTahun = (nilaiFilterTahun === "semua" || teksTahun === nilaiFilterTahun);
+                
+                if (cocokObat && cocokTahun) {
+                    baris.style.display = ""; 
+                    baris.querySelector(".kolom-nomor").textContent = nomorUrutBaru;
+                    nomorUrutBaru++; 
+                } else {
+                    baris.style.display = "none"; 
+                }
+            }
+        });
+    }
+
+    // Modal Control
+    function bukaModal(idModal) {
+        document.getElementById(idModal).style.display = 'flex';
+    }
+    
+    function tutupModal(idModal) {
+        document.getElementById(idModal).style.display = 'none';
+    }
+
+    // Kirim data ke Modal Edit saat tombol kuning diklik
+    function bukaModalEdit(id, nama_obat, bulan, tahun, jumlah_stok) {
+        document.getElementById('edit_nama_obat').value = nama_obat;
+        document.getElementById('edit_bulan').value = bulan;
+        document.getElementById('edit_tahun').value = tahun;
+        document.getElementById('edit_jumlah_stok').value = jumlah_stok;
+        
+        document.getElementById('formEdit').action = '/edit-obat/' + id;
+        bukaModal('modalEdit');
+    }
+
+    // Fungsi Hapus Instan
+    function konfirmasiHapus(id) {
+        if (confirm("⚠️ PERINGATAN: Yakin ingin menghapus data ini secara permanen?")) {
+            let form = document.getElementById('formHapus');
+            form.action = '/hapus-obat/' + id;
+            form.submit();
+        }
+    }
+</script>
+{% endblock %}

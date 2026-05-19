@@ -1,0 +1,170 @@
+/* app/static/css/style.css */
+
+:root {
+    --primary-blue: #3262E6; /* Biru sidebar */
+    --light-blue: #E8F0FE;   /* Biru muda background dashboard */
+    --text-color: #333;
+    --card-bg: rgba(255, 255, 255, 0.7); /* Transparansi untuk glassmorphism */
+    --card-border: 1px solid rgba(255, 255, 255, 0.4);
+    --shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif; /* Font bersih seperti di gambar */
+    background-color: var(--light-blue);
+    color: var(--text-color);
+}
+
+/* Tata Letak Utama Grid */
+.wrapper {
+    display: grid;
+    grid-template-columns: 260px 1fr; /* Sidebar lebar tetap, sisa konten */
+    min-height: 100vh;
+}
+
+/* --- Sidebar --- */
+.sidebar {
+    background: linear-gradient(180deg, rgba(50, 98, 230, 1) 0%, rgba(30, 60, 150, 1) 100%);
+    color: white;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+    flex-grow: 1;
+}
+
+.sidebar-menu-item {
+    margin-bottom: 10px;
+}
+
+.sidebar-link {
+    text-decoration: none;
+    color: rgba(255,255,255,0.8);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 15px;
+    border-radius: 8px;
+    transition: 0.3s;
+}
+
+.sidebar-link.active,
+.sidebar-link:hover {
+    background-color: rgba(255,255,255,0.2);
+    color: white;
+}
+
+/* --- Konten Utama --- */
+.main-content {
+    display: flex;
+    flex-direction: column;
+    background-color: transparent;
+}
+
+/* --- Header --- */
+.header {
+    background-color: transparent;
+    padding: 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-greeting {
+    font-size: 1.2rem;
+    color: #444;
+}
+
+/* Ganti dengan sapaan umum atau nama apotek */
+.header-greeting-text::after {
+    content: "Apotek Medilife 👋";
+}
+
+.header-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    border: var(--card-border);
+}
+
+/* --- Area Dashboard (Kartu & Chart) --- */
+.dashboard-area {
+    padding: 20px 40px 40px 40px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 kartu ringkasan (tanpa Total Admin) */
+    gap: 20px;
+}
+
+.stat-card {
+    background-color: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: var(--shadow);
+    border: var(--card-border);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.chart-section {
+    grid-column: span 2; /* Chart mengambil 2 kolom */
+    background-color: white;
+    padding: 20px;
+    border-radius: 15px;
+    border: var(--card-border);
+}
+
+.prediction-summary {
+    grid-column: span 1;
+    background-color: white;
+    padding: 20px;
+    border-radius: 15px;
+    border: var(--card-border);
+}
+
+/* Quick Menu */
+.quick-menu-area {
+    margin-top: 30px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Hapus 'Data Admin' */
+    gap: 15px;
+}
+
+.quick-menu-item {
+    background-color: white;
+    padding: 15px;
+    border-radius: 10px;
+    border: var(--card-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+}
+
+.footer {
+    padding: 20px;
+    text-align: center;
+    font-size: 0.8rem;
+    color: #888;
+    background-color: transparent;
+}

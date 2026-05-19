@@ -1,0 +1,278 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="dashboard-area">
+    
+    <div class="stat-card">
+        <div class="stat-icon" style="color: var(--primary-blue); font-size: 2rem;">
+            <i class="fas fa-database"></i>
+        </div>
+        <div class="stat-details">
+            <div style="font-size:0.8rem; color:#888;">Data Historis</div>
+            <div style="font-size:1.5rem; font-weight:bold;">{{ total_data }}</div>
+            <div style="font-size:0.7rem; color:#aaa;">Baris Data</div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon" style="color: #F7A35C; font-size: 2rem;">
+            <i class="fas fa-box"></i>
+        </div>
+        <div class="stat-details">
+            <div style="font-size:0.8rem; color:#888;">Total Stok (2022-2024)</div>
+            <div style="font-size:1.5rem; font-weight:bold;">{{ "{:,}".format(total_stok).replace(',', '.') }}</div>
+            <div style="font-size:0.7rem; color:#aaa;">Botol / Unit</div>
+        </div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-icon" style="color: #E74C3C; font-size: 2rem;">
+            <i class="fas fa-lightbulb"></i>
+        </div>
+        <div class="stat-details">
+            <div style="font-size:0.8rem; color:#888;">Proyeksi Bulan Depan</div>
+            <div style="font-size:1.5rem; font-weight:bold;">{{ "{:,}".format(total_prediksi).replace(',', '.') }}</div>
+            <div style="font-size:0.7rem; color:#aaa;">Total 3 Obat (Botol)</div>
+        </div>
+    </div>
+
+    <div class="chart-section">
+        <h3>Grafik Stok Obat (Historis)</h3>
+        <div style="position: relative; height: 350px; width: 100%;">
+            <canvas id="stokChart"></canvas>
+        </div>
+    </div>
+
+    <div class="prediction-summary">
+        <h3><i class="fas fa-robot" style="color: var(--primary-blue);"></i> Ringkasan Prediksi</h3>
+        <div style="font-size:0.9rem; color:#666;">Mesin: <span style="background-color: #34495E; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold;"><i class="fas fa-cogs"></i> Least Square</span></div>
+        
+        <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin-top:15px;">
+            <div style="text-align:center; padding:10px; background:#fdf8e4; border-radius:8px; border: 1px solid #fbeed5;">
+                <i class="fas fa-bullseye" style="color: #F39C12; font-size: 1.2rem; margin-bottom: 8px;"></i>
+                <div style="font-size:0.8rem; color:#555;">Rata-Rata MAD</div>
+                <div style="color:#D68910; font-weight:bold; font-size: 1.1rem;">{{ rata_mad }}</div>
+            </div>
+            <div style="text-align:center; padding:10px; background:#fef0f0; border-radius:8px; border: 1px solid #fadbd8;">
+                <i class="fas fa-calculator" style="color: #E74C3C; font-size: 1.2rem; margin-bottom: 8px;"></i>
+                <div style="font-size:0.8rem; color:#555;">Rata-Rata MSE</div>
+                <div style="color:#C0392B; font-weight:bold; font-size: 1.1rem;">{{ rata_mse }}</div>
+            </div>
+            <div style="text-align:center; padding:10px; background:#eafaf1; border-radius:8px; border: 1px solid #d5f5e3;">
+                <i class="fas fa-percentage" style="color: #27AE60; font-size: 1.2rem; margin-bottom: 8px;"></i>
+                <div style="font-size:0.8rem; color:#555;">Akurasi MAPE</div>
+                <div style="color:#1E8449; font-weight:bold; font-size: 1.1rem;">{{ rata_mape }}%</div>
+            </div>
+        </div>
+
+        <div style="margin-top:15px; font-size:0.85rem; color: #333; line-height: 1.6; background-color: #f8f9fa; padding: 10px; border-radius: 8px; border-left: 4px solid var(--primary-blue);">
+            <i class="fas fa-prescription-bottle-alt" style="color: #888; width: 20px;"></i> <strong>Objek:</strong> OBH Combi, Paratusin, Pimtrakol<br>
+            <i class="fas fa-calendar-check" style="color: #888; width: 20px;"></i> <strong>Proyeksi Terdekat:</strong> {{ periode_prediksi }}
+        </div>
+        
+        <a href="{{ url_for('views.prediksi') }}" style="text-decoration: none;">
+            <button style="width: 100%; margin-top: 15px; padding: 12px; background-color: var(--primary-blue); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.3s; display: flex; justify-content: center; align-items: center; gap: 8px;">
+                <i class="fas fa-search-chart"></i> Lihat Detail Prediksi
+            </button>
+        </a>
+    </div>
+
+    <style>
+        .modern-menu-item {
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #ffffff;
+            padding: 15px 20px;
+            border-radius: 12px;
+            border: 1px solid #eef2f5;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            color: #2c3e50;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .modern-menu-item:hover {
+            transform: translateY(-4px); /* Efek melayang saat disentuh mouse */
+            box-shadow: 0 8px 15px rgba(0,0,0,0.08);
+            border-color: #d1d8e0;
+        }
+        .modern-menu-item:hover .menu-arrow {
+            transform: translateX(5px); /* Panah bergerak ke kanan */
+            color: var(--primary-blue);
+        }
+        .menu-icon-box {
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+        .menu-arrow {
+            transition: all 0.3s ease;
+            color: #bdc3c7;
+            font-size: 1rem;
+        }
+    </style>
+
+    <style>
+        .modern-menu-item {
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 20px; /* Jarak antara teks dan panah */
+            background: #ffffff;
+            padding: 12px 20px;
+            border-radius: 12px;
+            border: 1px solid #eef2f5;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            color: #2c3e50;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: fit-content; /* Kunci agar tombol tidak melar memenuhi layar */
+        }
+        .modern-menu-item:hover {
+            transform: translateY(-3px); 
+            box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+            border-color: #d1d8e0;
+        }
+        .modern-menu-item:hover .menu-arrow {
+            transform: translateX(5px); 
+            color: var(--primary-blue);
+        }
+        .menu-icon-box {
+            width: 35px;
+            height: 35px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+        .menu-arrow {
+            transition: all 0.3s ease;
+            color: #bdc3c7;
+            font-size: 0.9rem;
+        }
+    </style>
+
+    <div class="quick-menu-area" style="margin-top: 35px; margin-bottom: 20px;">
+        <h3 style="color: #34495E; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px;">
+            <i class="fas fa-location-arrow" style="color: var(--primary-blue);"></i> Akses Menu Cepat
+        </h3>
+        
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+            
+            <a href="{{ url_for('views.data_obat') }}" class="modern-menu-item">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div class="menu-icon-box" style="background-color: #e8f4fd; color: var(--primary-blue);">
+                        <i class="fas fa-pills"></i>
+                    </div>
+                    <span>Kelola Data Obat</span>
+                </div>
+                <i class="fas fa-chevron-right menu-arrow"></i>
+            </a>
+
+            <a href="{{ url_for('views.prediksi') }}" class="modern-menu-item">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div class="menu-icon-box" style="background-color: #eafaf1; color: #27AE60;">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <span>Kalkulator Prediksi</span>
+                </div>
+                <i class="fas fa-chevron-right menu-arrow"></i>
+            </a>
+
+            <a href="{{ url_for('views.tentang') }}" class="modern-menu-item">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div class="menu-icon-box" style="background-color: #fdf3e8; color: #F39C12;">
+                        <i class="fas fa-id-badge"></i>
+                    </div>
+                    <span>Tentang Kami</span>
+                </div>
+                <i class="fas fa-chevron-right menu-arrow"></i>
+            </a>
+            
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block additional_scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script>
+        // Tangkap data JSON dari backend Python
+        const dataMentah = {{ chart_data|safe }};
+        
+        // Tentukan kanvas tujuan sesuai ID yang kamu buat
+        const ctx = document.getElementById('stokChart').getContext('2d');
+        
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: dataMentah.labels,
+                datasets: [
+                    {
+                        label: 'OBH Combi',
+                        data: dataMentah.datasets.obh_combi,
+                        borderColor: '#34495E',
+                        backgroundColor: 'rgba(52, 73, 94, 0.1)',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#34495E',
+                        tension: 0.3,
+                        fill: true
+                    },
+                    {
+                        label: 'Paratusin',
+                        data: dataMentah.datasets.paratusin,
+                        borderColor: '#16A085',
+                        backgroundColor: 'rgba(22, 160, 133, 0.1)',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#16A085',
+                        tension: 0.3,
+                        fill: true
+                    },
+                    {
+                        label: 'Pimtrakol',
+                        data: dataMentah.datasets.pimtrakol,
+                        borderColor: '#8E44AD',
+                        backgroundColor: 'rgba(142, 68, 173, 0.1)',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#8E44AD',
+                        tension: 0.3,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top' },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                        padding: 10
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { maxRotation: 45, minRotation: 45 }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'Jumlah Stok (Botol)' }
+                    }
+                },
+                interaction: { mode: 'nearest', axis: 'x', intersect: false }
+            }
+        });
+    </script>
+
+    <script src="{{ url_for('static', filename='js/dashboard_charts.js') }}"></script>
+{% endblock %}
