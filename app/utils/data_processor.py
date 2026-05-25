@@ -11,9 +11,9 @@ def import_csv_ke_db():
     """Fungsi untuk membaca 3 file CSV dan memindahkannya ke tabel historis_stok"""
     
     file_mapping = {
+        'demacolin.csv': 'demacolin'
         'obh_combi.csv': 'obh_combi',
         'paratusin.csv': 'paratusin',
-        'pimtrakol.csv': 'pimtrakol'
     }
 
     conn = sqlite3.connect(DB_PATH)

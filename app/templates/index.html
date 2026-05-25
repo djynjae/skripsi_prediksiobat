@@ -45,33 +45,47 @@
 
     <div class="prediction-summary">
         <h3><i class="fas fa-robot" style="color: var(--primary-blue);"></i> Ringkasan Prediksi</h3>
-        <div style="font-size:0.9rem; color:#666;">Mesin: <span style="background-color: #34495E; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold;"><i class="fas fa-cogs"></i> Least Square</span></div>
+        <div style="font-size:0.9rem; color:#666; margin-bottom: 15px;">Mesin: <span style="background-color: #34495E; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold;"><i class="fas fa-cogs"></i> Least Square</span></div>
         
-        <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin-top:15px;">
-            <div style="text-align:center; padding:10px; background:#fdf8e4; border-radius:8px; border: 1px solid #fbeed5;">
-                <i class="fas fa-bullseye" style="color: #F39C12; font-size: 1.2rem; margin-bottom: 8px;"></i>
-                <div style="font-size:0.8rem; color:#555;">Rata-Rata MAD</div>
-                <div style="color:#D68910; font-weight:bold; font-size: 1.1rem;">{{ rata_mad }}</div>
+        <div style="margin-bottom: 15px; text-align: left;">
+            <label style="display: block; font-weight: bold; font-size: 0.85rem; margin-bottom: 5px; color: #333;">Pilih Obat untuk Ringkasan Evaluasi:</label>
+            <select id="selectObatDashboard" onchange="gantiRingkasanObat()" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; background: white; font-weight: bold; color: #2C3E50; cursor: pointer; outline: none; box-sizing: border-box;">
+                <option value="obh_combi">OBH Combi</option>
+                <option value="paratusin">Paratusin</option>
+                <option value="demacolin">Demacolin</option>
+            </select>
+        </div>
+
+        <div id="panelRekomendasi" style="background: #F8F9FA; padding: 15px; border-radius: 10px; border-left: 5px solid #27AE60; margin-bottom: 15px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.02); text-align: left;">
+            <div style="font-size: 0.75rem; color: #27AE60; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 5px;">
+                <i class="fas fa-star" id="bintangAkurasi"></i> <span id="labelStatusAkurasi">Performa Prediksi Terbaik</span>
             </div>
-            <div style="text-align:center; padding:10px; background:#fef0f0; border-radius:8px; border: 1px solid #fadbd8;">
-                <i class="fas fa-calculator" style="color: #E74C3C; font-size: 1.2rem; margin-bottom: 8px;"></i>
-                <div style="font-size:0.8rem; color:#555;">Rata-Rata MSE</div>
-                <div style="color:#C0392B; font-weight:bold; font-size: 1.1rem;">{{ rata_mse }}</div>
-            </div>
-            <div style="text-align:center; padding:10px; background:#eafaf1; border-radius:8px; border: 1px solid #d5f5e3;">
-                <i class="fas fa-percentage" style="color: #27AE60; font-size: 1.2rem; margin-bottom: 8px;"></i>
-                <div style="font-size:0.8rem; color:#555;">Akurasi MAPE</div>
-                <div style="color:#1E8449; font-weight:bold; font-size: 1.1rem;">{{ rata_mape }}%</div>
+            
+            <div style="margin-top: 8px;">
+                <strong id="txtNamaObatDashboard" style="font-size: 1.2rem; color: #2C3E50; display: block;">OBH Combi</strong>
             </div>
         </div>
 
-        <div style="margin-top:15px; font-size:0.85rem; color: #333; line-height: 1.6; background-color: #f8f9fa; padding: 10px; border-radius: 8px; border-left: 4px solid var(--primary-blue);">
-            <i class="fas fa-prescription-bottle-alt" style="color: #888; width: 20px;"></i> <strong>Objek:</strong> OBH Combi, Paratusin, Pimtrakol<br>
-            <i class="fas fa-calendar-check" style="color: #888; width: 20px;"></i> <strong>Proyeksi Terdekat:</strong> {{ periode_prediksi }}
+        <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin-top:15px;">
+            <div style="text-align:center; padding:10px; background:#fdf8e4; border-radius:8px; border: 1px solid #fbeed5;">
+                <i class="fas fa-bullseye" style="color: #F39C12; font-size: 1.2rem; margin-bottom: 8px;"></i>
+                <div style="font-size:0.75rem; color:#555; font-weight: 500;">Rata MAD</div>
+                <div id="txtMadDashboard" style="color:#D68910; font-weight:bold; font-size: 1.1rem; margin-top: 4px;">{{ rata_mad }}</div>
+            </div>
+            <div style="text-align:center; padding:10px; background:#fef0f0; border-radius:8px; border: 1px solid #fadbd8;">
+                <i class="fas fa-calculator" style="color: #E74C3C; font-size: 1.2rem; margin-bottom: 8px;"></i>
+                <div style="font-size:0.75rem; color:#555; font-weight: 500;">Rata MSE</div>
+                <div id="txtMseDashboard" style="color:#C0392B; font-weight:bold; font-size: 1.1rem; margin-top: 4px;">{{ rata_mse }}</div>
+            </div>
+            <div style="text-align:center; padding:10px; background:#eafaf1; border-radius:8px; border: 1px solid #d5f5e3;">
+                <i class="fas fa-percentage" style="color: #27AE60; font-size: 1.2rem; margin-bottom: 8px;"></i>
+                <div style="font-size:0.75rem; color:#555; font-weight: 500;">Akurasi MAPE</div>
+                <div id="txtMapeDashboard" style="color:#1E8449; font-weight:bold; font-size: 1.1rem; margin-top: 4px;">{{ rata_mape }}%</div>
+            </div>
         </div>
         
         <a href="{{ url_for('views.prediksi') }}" style="text-decoration: none;">
-            <button style="width: 100%; margin-top: 15px; padding: 12px; background-color: var(--primary-blue); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.3s; display: flex; justify-content: center; align-items: center; gap: 8px;">
+            <button style="width: 100%; margin-top: 20px; padding: 12px; background-color: var(--primary-blue); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.3s; display: flex; justify-content: center; align-items: center; gap: 8px;">
                 <i class="fas fa-search-chart"></i> Lihat Detail Prediksi
             </button>
         </a>
@@ -236,8 +250,8 @@
                         fill: true
                     },
                     {
-                        label: 'Pimtrakol',
-                        data: dataMentah.datasets.pimtrakol,
+                        label: 'Demacolin',
+                        data: dataMentah.datasets.demacolin,
                         borderColor: '#8E44AD',
                         backgroundColor: 'rgba(142, 68, 173, 0.1)',
                         borderWidth: 3,
@@ -270,6 +284,57 @@
                     }
                 },
                 interaction: { mode: 'nearest', axis: 'x', intersect: false }
+            }
+        });
+    </script>
+
+    <script>
+        const dataEvaluasiObat = {{ data_semua_obat|default('{}')|safe }};
+        const obatTerakuratRaw = "{{ obat_terakurat['nama_raw'] if obat_terakurat is defined else '' }}";
+
+        function gantiRingkasanObat() {
+            const obatTerpilih = document.getElementById("selectObatDashboard").value;
+            const dataObat = dataEvaluasiObat[obatTerpilih];
+
+            if (!dataObat) return;
+
+            // 1. Ubah teks Nama Obat secara live
+            let namaTampil = "OBH Combi";
+            if (obatTerpilih === "paratusin") namaTampil = "Paratusin";
+            if (obatTerpilih === "demacolin") namaTampil = "Demacolin";
+            document.getElementById("txtNamaObatDashboard").textContent = namaTampil;
+
+            // 2. Ubah angka indikator rata-rata evaluasi total (MAD, MSE, MAPE)
+            document.getElementById("txtMadDashboard").textContent = dataObat.MAD.toFixed(1);
+            document.getElementById("txtMseDashboard").textContent = dataObat.MSE.toFixed(1);
+            document.getElementById("txtMapeDashboard").textContent = dataObat.MAPE.toFixed(1) + "%";
+
+            // 3. Ubah style visual dekorasi panel jika obat terpilih merupakan yang paling akurat
+            const panel = document.getElementById("panelRekomendasi");
+            const bintang = document.getElementById("bintangAkurasi");
+            const labelStatus = document.getElementById("labelStatusAkurasi");
+
+            if (obatTerpilih === obatTerakuratRaw) {
+                panel.style.borderLeft = "5px solid #27AE60";
+                bintang.style.color = "#F1C40F";
+                bintang.className = "fas fa-star";
+                labelStatus.textContent = "Performa Prediksi Terbaik";
+                labelStatus.style.color = "#27AE60";
+            } else {
+                panel.style.borderLeft = "5px solid #34495E";
+                bintang.style.color = "#95a5a6";
+                bintang.className = "fas fa-info-circle";
+                labelStatus.textContent = "Ringkasan Evaluasi Akurasi";
+                labelStatus.style.color = "#34495E";
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            if (Object.keys(dataEvaluasiObat).length > 0) {
+                if (obatTerakuratRaw) {
+                    document.getElementById("selectObatDashboard").value = obatTerakuratRaw;
+                }
+                gantiRingkasanObat();
             }
         });
     </script>
