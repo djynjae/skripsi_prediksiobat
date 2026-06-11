@@ -1,7 +1,6 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session
+from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from functools import wraps
 from app.utils.least_square import hitung_prediksi_least_square
-from flask import request
 import pandas as pd
 import sqlite3
 from app.models.database import get_semua_stok, get_stok_by_obat, tambah_stok, update_stok, hapus_stok
@@ -43,29 +42,39 @@ def login():
 
     return render_template('login.html', error=error)
 
-@views.route('/import-csv-obat', methods=['POST'])
+@views.route('/import-excel-obat', methods=['POST'])
 @login_required
-def import_csv_obat():
-    file = request.files.get('file_csv')
+def import_excel_obat():
+    # Pastikan atribut name pada input file di HTML kamu juga diganti menjadi 'file_excel'
+    file = request.files.get('file_excel')
     nama_obat = request.form.get('nama_obat')
 
     if not file or file.filename == '':
-        flash('Gagal: Tidak ada file CSV yang dipilih!', 'error')
+        flash('Gagal: Tidak ada file Excel yang dipilih!', 'error')
+        return redirect(url_for('views.data_obat'))
+
+    # =======================================================
+    # VALIDASI EKSTENSI FILE & ERROR TEMPLATE
+    # =======================================================
+    if not file.filename.endswith(('.xlsx', '.xls')):
+        # Menggunakan kategori flash 'error_template' untuk memicu tombol download di HTML
+        flash('Format file yang dikirim salah! Harap gunakan file berekstensi .xlsx dan sesuaikan dengan format template.', 'error_template')
         return redirect(url_for('views.data_obat'))
 
     try:
-        df = pd.read_csv(file, sep=';', encoding='utf-8-sig')
+        # BACA EXCEL: Menggunakan pd.read_excel (tidak perlu parameter sep atau encoding)
+        df = pd.read_excel(file)
         df.columns = df.columns.str.lower().str.strip()
 
         # Validasi kolom wajib
         kolom_wajib = ['bulan', 'tahun', 'stok']
         for kolom in kolom_wajib:
             if kolom not in df.columns:
-                flash(f'Gagal: Kolom "{kolom}" tidak ditemukan di file CSV!', 'error')
+                flash(f'Gagal: Kolom "{kolom}" tidak ditemukan di file Excel. Harap gunakan template yang disediakan.', 'error_template')
                 return redirect(url_for('views.data_obat'))
 
         # =======================================================
-        # KAMUS PENERJEMAH BULAN OTOMATIS (Mencegat Ulah Excel)
+        # KAMUS PENERJEMAH BULAN OTOMATIS
         # =======================================================
         kamus_bulan = {
             'jan': 'Januari', 'feb': 'Februari', 'mar': 'Maret', 'apr': 'April',
@@ -78,21 +87,15 @@ def import_csv_obat():
 
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
-
         berhasil_masuk = 0
         
         for index, row in df.iterrows():
-            # 1. Ambil data bulan dari CSV, ubah ke huruf kecil semua, hapus spasi ujung
             bulan_mentah = str(row['bulan']).strip().lower()
-            
-            # 2. Terjemahkan otomatis menggunakan kamus di atas. 
-            # Jika tidak terdaftar di kamus, gunakan kata aslinya dengan huruf kapital di awal.
             bulan = kamus_bulan.get(bulan_mentah, bulan_mentah.capitalize())
             
             tahun = int(row['tahun'])
             jumlah_stok = int(row['stok']) 
 
-            # 3. Masukkan data yang sudah rapi berbahasa Indonesia ke database
             cursor.execute(
                 'INSERT INTO historis_stok (nama_obat, bulan, tahun, jumlah_stok) VALUES (?, ?, ?, ?)',
                 (nama_obat, bulan, tahun, jumlah_stok)
@@ -102,10 +105,14 @@ def import_csv_obat():
         conn.commit()
         conn.close()
 
-        flash(f'Berhasil mengimpor {berhasil_masuk} baris data CSV ke dalam sistem.', 'success')
+        flash(f'Berhasil mengimpor {berhasil_masuk} baris data Excel ke dalam sistem.', 'success')
 
+    except ValueError:
+        # Menangkap error jika isi Excel korup atau struktur tabel tidak bisa dibaca Pandas
+        flash('Format data di dalam file tidak dapat dibaca. Harap sesuaikan isinya murni mengikuti format template.', 'error_template')
     except Exception as e:
-        flash(f'Terjadi kesalahan saat memproses CSV: {str(e)}', 'error')
+        # Menangkap error umum lainnya
+        flash(f'Terjadi kesalahan sistem saat memproses Excel: {str(e)}', 'error')
 
     return redirect(url_for('views.data_obat'))
 

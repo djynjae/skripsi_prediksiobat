@@ -49,48 +49,122 @@
 
         {% if hasil %}
         
-        <div id="area-cetak-pdf" style="background: white; padding: 5px;">
-            
-            <div style="margin-bottom: 20px; border-bottom: 2px solid #34495E; padding-bottom: 10px;">
-                <h3 style="margin: 0; text-transform: uppercase; color: #2C3E50; font-size: 1.1rem;">Laporan Hasil Prediksi Stok Obat Apotek Medilife</h3>
-                <p style="margin: 5px 0 0 0; color: #7f8c8d; font-size: 0.85rem;">
-                    Data Obat: <strong>
+        <div id="area-cetak-pdf" style="background: #ffffff; padding: 35px; font-family: 'Segoe UI', Helvetica, Arial, sans-serif; color: #2C3E50; position: relative;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+                <div style="display: flex; gap: 15px; align-items: center;">
+                    <img src="{{ url_for('static', filename='img/medilife.png') }}" alt="Logo Apotek" style="width: 120px; height: 120px; object-fit: contain;">
+                    <div>
+                        <h2 style="margin: 0; color: #2C3E50; font-size: 1.6rem; font-weight: 800; letter-spacing: 1px;">APOTEK <span style="color: #3498DB;">MEDILIFE</span></h2>
+                        <p style="margin: 4px 0; font-size: 0.75rem; color: #7F8C8D; font-weight: bold; letter-spacing: 1px; text-transform: uppercase;">Sistem Prediksi Stok Obat Medilife</p>
+                        <p style="margin: 2px 0; font-size: 0.75rem; color: #7F8C8D;">Perumahan Jl. Bluru Permai No.21 Blok M, Dusun Bluru Kidul, Bluru Kidul, Kec. Sidoarjo, Kabupaten Sidoarjo, Jawa Timur 61233</p>
+                        <p style="margin: 0; font-size: 0.75rem; color: #7F8C8D;">Telp: 0822-7999-9359</p>
+                    </div>
+                </div>
+
+                <div style="text-align: right; display: flex; flex-direction: column; justify-content: center; margin-top: 10px;">
+                    <span style="font-size: 0.7rem; color: #95A5A6; font-weight: bold; letter-spacing: 1px;">TANGGAL & JAM CETAK</span>
+                    <strong id="pdf-tgl-cetak" style="color: #E74C3C; font-size: 1.1rem; margin-top: 6px;">-</strong>
+                    <strong id="pdf-jam-cetak" style="color: #E74C3C; font-size: 1.1rem; margin-top: 2px;">-</strong>
+                </div>
+            </div>
+
+            <div style="height: 4px; background: #3498DB; margin-bottom: 2px;"></div>
+            <div style="height: 1px; background: #2C3E50; margin-bottom: 25px;"></div>
+
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h2 style="margin: 0; font-size: 1.4rem; color: #2C3E50; letter-spacing: 3px; text-transform: uppercase;">Laporan Hasil Prediksi</h2>
+                <p style="margin: 8px 0 0 0; font-size: 0.85rem; color: #7F8C8D;">
+                    Data Obat: <strong style="color: #E74C3C;">
                         {% if obat_terpilih == 'obh_combi' %}OBH Combi
                         {% elif obat_terpilih == 'paratusin' %}Paratusin
                         {% elif obat_terpilih == 'demacolin' %}Demacolin
                         {% else %}{{ obat_terpilih }}{% endif %}
-                    </strong> | Metode: Least Square
+                    </strong>
                 </p>
             </div>
 
-            <h4 style="margin-top: 15px; border-bottom: 2px solid #eee; padding-bottom: 10px; color: #34495E;">
-                <i class="fas fa-calendar-alt"></i> Tabel Obat Untuk {{ hasil['prediksi_mendatang']|length }} Bulan ke Depan
-            </h4>
-            <table style="width: 100%; border-collapse: collapse; text-align: center; margin-bottom: 15px;">
-                <thead style="background-color: var(--primary-blue); color: white;">
-                    <tr>
-                        <th style="padding: 12px; border: 1px solid #ddd; font-size: 0.9rem;">Bulan Ke-</th>
-                        <th style="padding: 12px; border: 1px solid #ddd; font-size: 0.9rem;">Periode</th>
-                        <th style="padding: 12px; border: 1px solid #ddd; font-size: 0.9rem;">Kebutuhan Stok</th>
+            <table style="width: 100%; border-collapse: collapse; text-align: left; margin-bottom: 35px; font-size: 0.9rem;">
+                <thead>
+                    <tr style="background-color: #FDFEFE; border-top: 2px solid #EAECEE; border-bottom: 2px solid #EAECEE;">
+                        <th style="padding: 12px 15px; font-weight: 700; color: #2C3E50;">Periode</th>
+                        <th style="padding: 12px 15px; font-weight: 700; color: #E74C3C; text-align: left;">Least Square</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for item in hasil['prediksi_mendatang'] %}
-                    <tr style="background-color: {% if loop.index % 2 == 0 %}#f9f9f9{% else %}white{% endif %};">
-                        <td style="padding: 10px; border: 1px solid #ddd;">{{ loop.index }}</td>
-                        <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold; color: #2c3e50;">{{ item['periode'] }}</td>
-                        <td style="padding: 10px; border: 1px solid #ddd; font-size: 1.1rem; color: #27AE60; font-weight: bold;">
-                            {{ item['nilai'] | round(1) }} Botol
+                    <tr style="border-bottom: 1px solid #EAECEE;">
+                        <td style="padding: 12px 15px; color: #2C3E50;">{{ item['periode'] }}</td>
+                        <td style="padding: 12px 15px; color: #E74C3C; font-weight: bold;">
+                            {{ item['nilai'] | round(2) }}
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
 
-            <div style="margin-top: 20px; font-size: 0.8rem; color: #7f8c8d; text-align: right; margin-bottom: 10px;">
-                * Laporan diunduh secara otomatis melalui Aplikasi Prediksi Metode Least Square.
+            <div style="background-color: #c4e4f9; padding: 10px 15px; border-left: 5px solid #3498DB; border-top: 1px solid #EAECEE; border-right: 1px solid #EAECEE; font-weight: bold; color: #2C3E50; font-size: 0.95rem;">
+                Akurasi Metode
+            </div>
+            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem; border-bottom: 2px solid #EAECEE; margin-bottom: 35px;">
+                <thead>
+                    <tr style="background-color: #FDFEFE; border-bottom: 2px solid #EAECEE;">
+                        <th style="padding: 12px 15px; color: #2C3E50; font-weight: 700;">Metode</th>
+                        <th style="padding: 12px 15px; color: #2C3E50; font-weight: 700;">MAD</th>
+                        <th style="padding: 12px 15px; color: #2C3E50; font-weight: 700;">MSE</th>
+                        <th style="padding: 12px 15px; color: #2C3E50; font-weight: 700;">MAPE</th>
+                        <th style="padding: 12px 15px; color: #2C3E50; font-weight: 700; text-align: center;">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 12px 15px;">
+                            <span style="color: #E74C3C; border: 1px solid #FADBD8; background: #FDEDEC; padding: 4px 12px; border-radius: 20px; font-weight: bold;">
+                                Least Square
+                            </span>
+                        </td>
+                        <td style="padding: 12px 15px; color: #2C3E50;">{{ hasil['evaluasi']['MAD'] | round(1) }}</td>
+                        <td style="padding: 12px 15px; color: #2C3E50;">{{ hasil['evaluasi']['MSE'] | round(1) }}</td>
+                        <td style="padding: 12px 15px; color: #27AE60; font-weight: bold;">{{ hasil['evaluasi']['MAPE'] | round(1) }}%</td>
+                        <td style="padding: 12px 15px; text-align: center;">
+                            <span style="color: #27AE60; border: 1px solid #A9DFBF; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; background: #EAF2F8;">
+                                <i class="fas fa-check"></i> Terbaik
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div style="background-color: #c4e4f9; padding: 10px 15px; border-left: 5px solid #3498DB; border-top: 1px solid #EAECEE; border-right: 1px solid #EAECEE; font-weight: bold; color: #2C3E50; font-size: 0.95rem;">
+                Kesimpulan & Rekomendasi
+            </div>
+            <div style="border-left: 1px solid #EAECEE; border-right: 1px solid #EAECEE; border-bottom: 2px solid #EAECEE; padding: 20px; font-size: 0.85rem; line-height: 1.6; text-align: left; background: #FAFAFA;">
+                <div style="margin-bottom: 12px;">
+                    <span style="font-weight: bold; color: #7F8C8D; display: block; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px;">Metode Terbaik</span>
+                    <strong style="color: #E74C3C; font-size: 1rem;">Least Square</strong>
+                </div>
+                <div>
+                    <span style="font-weight: bold; color: #7F8C8D; display: block; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; margin-bottom: 4px;">Analisis & Rekomendasi</span>
+                    <p style="margin: 0 0 8px 0; color: #2C3E50;">
+                        Berdasarkan hasil analisis peramalan kebutuhan stok obat 
+                        <strong>
+                            {% if obat_terpilih == 'obh_combi' %}OBH Combi
+                            {% elif obat_terpilih == 'paratusin' %}Paratusin
+                            {% elif obat_terpilih == 'demacolin' %}Demacolin
+                            {% else %}{{ obat_terpilih }}{% endif %}
+                        </strong> 
+                        menggunakan metode Least Square, diperoleh nilai MAPE sebesar <strong style="color: #27AE60;">{{ hasil['evaluasi']['MAPE'] | round(1) }}%</strong>.
+                    </p>
+                    <p style="margin: 0; color: #2C3E50;">
+                        Metode Least Square terbukti sangat akurat karena memiliki nilai MAPE yang termasuk ke dalam kategori sangat baik. Dengan demikian, metode ini direkomendasikan sebagai acuan peramalan pengadaan stok obat di Apotek Medilife untuk periode selanjutnya.
+                    </p>
+                </div>
+            </div>
+            
+            <div style="margin-top: 35px; text-align: center; font-size: 0.7rem; color: #BDC3C7;">
+                * Laporan dicetak otomatis dari Sistem Informasi Peramalan Apotek Medilife v1.0
             </div>
         </div>
+
         <h4 style="margin-top: 30px; margin-bottom: 10px; color: #34495E;">
             <i class="fas fa-chart-line"></i> Tabel Evaluasi Prediksi Masa Lalu (Akurasi Least Square)
         </h4>
@@ -141,18 +215,41 @@
 
 <script>
 function unduhLaporanPDF() {
+    // 1. Suntik Tanggal & Jam Cetak Realtime ke Kop Surat Kanan
+    const tglCetak = document.getElementById('pdf-tgl-cetak');
+    const jamCetak = document.getElementById('pdf-jam-cetak');
+    
+    if (tglCetak && jamCetak) {
+        const sekarang = new Date();
+        
+        // Menghasilkan format: 05 Jun 2026
+        const opsiTgl = { day: '2-digit', month: 'short', year: 'numeric' };
+        tglCetak.textContent = sekarang.toLocaleDateString('id-ID', opsiTgl);
+        
+        // Menghasilkan format: 17:03 WIB
+        const opsiJam = { hour: '2-digit', minute: '2-digit' };
+        jamCetak.textContent = sekarang.toLocaleTimeString('id-ID', opsiJam).replace(/\./g, ':') + ' WIB';
+    }
+
+    // 2. Tunjuk Target Render HTML
     const elemen = document.getElementById('area-cetak-pdf');
     let namaObat = "{{ obat_terpilih }}".toUpperCase();
     
-    const opsi = {
-        margin:       12,
-        filename:     'Laporan_Prediksi_Stok_' + namaObat + '.pdf',
+    // 3. Konfigurasi Kualitas Cetak Resolusi HD
+    const opsiCetak = {
+        margin:       10, 
+        filename:     'Laporan_Prediksi_' + namaObat + '.pdf',
         image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, logging: false },
+        html2canvas:  { 
+            scale: 3, 
+            useCORS: true, 
+            logging: false 
+        },
         jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
     
-    html2pdf().set(opsi).from(elemen).save();
+    // 4. Proses Unduh PDF
+    html2pdf().set(opsiCetak).from(elemen).save();
 }
 </script>
 {% endblock %}

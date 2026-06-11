@@ -5,17 +5,32 @@
 
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
+            <div style="margin-bottom: 20px;">
             {% for category, message in messages %}
-                {% if category == 'error' %}
-                <div style="padding: 15px; margin-bottom: 20px; border-radius: 8px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;">
-                    <i class="fas fa-exclamation-circle"></i> {{ message }}
+            
+            {% if category != 'error_template' %}
+                <div style="padding: 15px; border-radius: 8px; margin-bottom: 10px; font-weight: bold; 
+                    {% if category == 'success' %}background-color: #D5F5E3; color: #1E8449; border-left: 5px solid #27AE60;
+                    {% else %}background-color: #FDEDEC; color: #C0392B; border-left: 5px solid #E74C3C;{% endif %}">
+                    {{ message }}
                 </div>
-                {% else %}
-                <div style="padding: 15px; margin-bottom: 20px; border-radius: 8px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb;">
-                    <i class="fas fa-check-circle"></i> {{ message }}
+            {% endif %}
+
+            {% if category == 'error_template' %}
+                <div style="background-color: #FDEDEC; border-left: 5px solid #E74C3C; padding: 15px; border-radius: 8px; margin-bottom: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                    <h4 style="color: #C0392B; margin-top: 0; margin-bottom: 8px; font-size: 1.1rem;">
+                        <i class="fas fa-exclamation-triangle"></i> Gagal Mengimpor File
+                    </h4>
+                    <p style="color: #2C3E50; margin: 0 0 15px 0; font-size: 0.9rem;">{{ message }}</p>
+                    
+                    <a href="{{ url_for('static', filename='berkas/template_data_stok.xlsx') }}" download style="background-color: #E74C3C; color: white; padding: 8px 16px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 8px; transition: 0.3s;">
+                        <i class="fas fa-file-excel"></i> Download Template Format
+                    </a>
                 </div>
-                {% endif %}
+            {% endif %}
+
             {% endfor %}
+            </div>
         {% endif %}
     {% endwith %}
 
@@ -25,15 +40,12 @@
             <h2><i class="fas fa-history" style="color: var(--primary-blue);"></i> Data Historis Obat</h2>
             
             <div style="display: flex; gap: 10px;">
-                <button onclick="bukaModal('modalImportCSV')" style="padding: 10px 20px; background-color: #3498DB; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px;">
-                    <i class="fas fa-file-csv"></i> Import CSV
+                <button onclick="bukaModal('modalImportExcel')" style="padding: 10px 20px; background-color: #27AE60; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-file-excel"></i> Import Excel
                 </button>
                 <button onclick="bukaModal('modalHapusSemua')" style="padding: 10px 20px; background-color: #E74C3C; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px;">
                     <i class="fas fa-trash-alt"></i> Hapus Obat
                 </button>
-                <!-- <button onclick="bukaModal('modalTambah')" style="padding: 10px 20px; background-color: #27AE60; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px;">
-                    <i class="fas fa-plus"></i> Tambah Data
-                </button> -->
             </div>
         </div>
 
@@ -124,10 +136,10 @@
     </div>
 </div>
 
-<div id="modalImportCSV" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+<div id="modalImportExcel" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
     <div style="background: white; padding: 30px; border-radius: 12px; width: 400px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
-        <h3 style="margin-top: 0; color: #3498DB;"><i class="fas fa-file-upload"></i> Import via File CSV</h3>
-        <form action="{{ url_for('views.import_csv_obat') }}" method="POST" enctype="multipart/form-data">
+        <h3 style="margin-top: 0; color: #27AE60;"><i class="fas fa-file-excel"></i> Import via File Excel</h3>
+        <form action="{{ url_for('views.import_excel_obat') }}" method="POST" enctype="multipart/form-data">
             <div style="margin-bottom: 15px;">
                 <label style="display: block; font-weight: bold; margin-bottom: 5px;">Pilih Target Obat</label>
                 <select name="nama_obat" required style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc;">
@@ -137,48 +149,16 @@
                 </select>
             </div>
             <div style="margin-bottom: 20px;">
-                <label style="display: block; font-weight: bold; margin-bottom: 5px;">File CSV</label>
-                <input type="file" name="file_csv" accept=".csv" required style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;">File Excel (.xlsx)</label>
+                <input type="file" name="file_excel" accept=".xlsx, .xls" required style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box;">
                 <small style="color: #666; display: block; margin-top: 5px; line-height: 1.4;">
-                    * Struktur kolom harus berisi: <strong>No;Bulan;Tahun;Stok</strong><br>
-                    * Gunakan pemisah titik koma (;)
+                    * Pastikan kolom berisi: <strong>Bulan, Tahun, Stok</strong><br>
+                    * Harap gunakan format dari Template yang disediakan.
                 </small>
             </div>
             <div style="display: flex; justify-content: flex-end; gap: 10px;">
-                <button type="button" onclick="tutupModal('modalImportCSV')" style="padding: 10px 15px; background: #95a5a6; color: white; border: none; border-radius: 6px; cursor: pointer;">Batal</button>
-                <button type="submit" style="padding: 10px 15px; background: #3498DB; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">Mulai Upload</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<div id="modalTambah" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
-    <div style="background: white; padding: 30px; border-radius: 12px; width: 400px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
-        <h3 style="margin-top: 0; color: var(--primary-blue);">Tambah Stok Historis</h3>
-        <form action="{{ url_for('views.tambah_obat') }}" method="POST">
-            <div style="margin-bottom: 15px;">
-                <label style="display: block; font-weight: bold; margin-bottom: 5px;">Nama Obat</label>
-                <select name="nama_obat" required style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc;">
-                    <option value="obh_combi">OBH Combi</option>
-                    <option value="paratusin">Paratusin</option>
-                    <option value="demacolin">Demacolin</option>
-                </select>
-            </div>
-            <div style="margin-bottom: 15px;">
-                <label style="display: block; font-weight: bold; margin-bottom: 5px;">Bulan</label>
-                <input type="text" name="bulan" placeholder="Contoh: Januari" required style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box;">
-            </div>
-            <div style="margin-bottom: 15px;">
-                <label style="display: block; font-weight: bold; margin-bottom: 5px;">Tahun</label>
-                <input type="number" name="tahun" placeholder="Contoh: 2024" required style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box;">
-            </div>
-            <div style="margin-bottom: 25px;">
-                <label style="display: block; font-weight: bold; margin-bottom: 5px;">Jumlah Stok (Botol)</label>
-                <input type="number" name="jumlah_stok" min="0" required style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box;">
-            </div>
-            <div style="display: flex; justify-content: flex-end; gap: 10px;">
-                <button type="button" onclick="tutupModal('modalTambah')" style="padding: 10px 15px; background: #95a5a6; color: white; border: none; border-radius: 6px; cursor: pointer;">Batal</button>
-                <button type="submit" style="padding: 10px 15px; background: #27AE60; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">Simpan Data</button>
+                <button type="button" onclick="tutupModal('modalImportExcel')" style="padding: 10px 15px; background: #95a5a6; color: white; border: none; border-radius: 6px; cursor: pointer;">Batal</button>
+                <button type="submit" style="padding: 10px 15px; background: #27AE60; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">Mulai Upload</button>
             </div>
         </form>
     </div>
@@ -257,12 +237,10 @@
                 let teksTahun = baris.querySelector(".kolom-tahun").textContent.trim();
                 let teksBulan = baris.querySelector(".kolom-bulan").textContent.toLowerCase().trim();
                 
-                // Logika pengecekan kecocokan filter
                 let cocokObat = (nilaiFilterObat === "semua" || teksNamaObat.includes(nilaiFilterObat));
                 let cocokTahun = (nilaiFilterTahun === "semua" || teksTahun === nilaiFilterTahun);
                 let cocokBulan = (nilaiFilterBulan === "semua" || teksBulan === nilaiFilterBulan);
                 
-                // Jika memenuhi ketiga kondisi filter, tampilkan barisnya
                 if (cocokObat && cocokTahun && cocokBulan) {
                     baris.style.display = ""; 
                     baris.querySelector(".kolom-nomor").textContent = nomorUrutBaru;
@@ -274,7 +252,7 @@
         });
     }
 
-    // Modal Control (Bisa menangani modal tambah, edit, maupun import csv)
+    // Modal Control
     function bukaModal(idModal) {
         document.getElementById(idModal).style.display = 'flex';
     }
@@ -283,7 +261,7 @@
         document.getElementById(idModal).style.display = 'none';
     }
 
-    // Kirim data ke Modal Edit saat tombol kuning diklik
+    // Kirim data ke Modal Edit
     function bukaModalEdit(id, nama_obat, bulan, tahun, jumlah_stok) {
         document.getElementById('edit_nama_obat').value = nama_obat;
         document.getElementById('edit_bulan').value = bulan;

@@ -13,7 +13,7 @@
     <div class="wrapper">
         <nav class="sidebar">
             <div class="sidebar-logo">
-                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Medilife Logo" width="30">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Medilife Logo" width="50">
                 Apotek MEDILIFE
             </div>
 
@@ -52,9 +52,8 @@
                     <span class="header-greeting-text"></span>
                     <div style="font-size:0.9rem; color:#666;">Sistem Prediksi Stok Obat - Metode Least Square</div>
                 </div>
-                <div class="header-meta">
-                    <i class="far fa-calendar-alt"></i>
-                    Kamis, 15 Mei 2025
+                <div class="header-meta" id="waktu-realtime">
+                    <i class="far fa-calendar-alt"></i> Memuat waktu...
                 </div>
             </header>
 
@@ -66,5 +65,32 @@
         </main>
     </div>
     {% block additional_scripts %}{% endblock %}
+    <script>
+        function jalankanWaktuRealtime() {
+            const elemenWaktu = document.getElementById('waktu-realtime');
+            if (!elemenWaktu) return;
+
+            // Ambil waktu saat ini dari sistem
+            const waktuSekarang = new Date();
+
+            // Pengaturan format hari dan tanggal (Bahasa Indonesia)
+            const opsiTanggal = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+            const stringTanggal = waktuSekarang.toLocaleDateString('id-ID', opsiTanggal);
+
+            // Pengaturan format jam, menit, detik (24 Jam)
+            const opsiJam = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+            // Replace titik dengan titik dua karena format id-ID kadang menggunakan titik (10.45.00 -> 10:45:00)
+            const stringJam = waktuSekarang.toLocaleTimeString('id-ID', opsiJam).replace(/\./g, ':');
+
+            // Cetak ke dalam HTML
+            elemenWaktu.innerHTML = `<i class="far fa-calendar-alt"></i> ${stringTanggal} | ${stringJam} WIB`;
+        }
+
+        // Jalankan fungsinya langsung saat halaman dimuat
+        jalankanWaktuRealtime();
+        
+        // Perbarui fungsi setiap 1000 milidetik (1 detik)
+        setInterval(jalankanWaktuRealtime, 1000);
+    </script>
 </body>
 </html>
